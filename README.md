@@ -11,6 +11,7 @@
 - **Global configuration**: Injects global configurations into classes that require them.
 - **Session storage**: Provides an in-memory session storage system for managing temporary data.
 - **Notifications**: Includes a customizable notification system with different types (success, error, info) and progress bars.
+- **Floating Dialogs**: Provides a modal dialog system with a customizable backdrop, supporting both white and black themes.
 
 ---
 
@@ -180,7 +181,7 @@ class MainScreen(QWidget):
 
         # Button to show a notification
         buttonNotify = QPushButton('Show Notification')
-        buttonNotify.clicked.connect(lambda: Qurderer.Notify("This is a notification!", 3000, parent))
+        buttonNotify.clicked.connect(lambda: Qurderer.components.Notify("This is a notification!", 3000, parent))
 
         # Button to navigate to another screen
         buttonNavigate = QPushButton('Go to Other Screen')
@@ -193,6 +194,20 @@ class MainScreen(QWidget):
         buttonClosePopup = QPushButton('Close Popup')
         buttonClosePopup.clicked.connect(lambda: parent.closeWindow(PopupWindow(parent).name))
 
+        # Dialog example
+        dialogLayout = QVBoxLayout()
+        dialogLayout.addWidget(QLabel('Hello in dialog.'))
+
+        dialog = Qurderer.components.Dialog(parent, dialogLayout)
+
+        buttonDialog = QPushButton('Close Dialog')
+        buttonDialog.clicked.connect(dialog.close)
+
+        dialog.addWidget(buttonDialog)
+
+        buttonOpenDialog = QPushButton('Open Dialog')
+        buttonOpenDialog.clicked.connect(dialog.show)
+        
         # Add widgets to the layout
         layout.addWidget(label)
         layout.addWidget(configLabel)
@@ -201,6 +216,7 @@ class MainScreen(QWidget):
         layout.addWidget(buttonNavigate)
         layout.addWidget(buttonPopup)
         layout.addWidget(buttonClosePopup)
+        layout.addWidget(buttonOpenDialog)
 
         # Set the layout
         self.setLayout(layout)
@@ -275,7 +291,7 @@ class PopupWindow(QMainWindow):
     def showSessionData(self):
         """Show session data in a notification."""
         value = self.sessionStorage.getItem('test')
-        Qurderer.Notify(f"Session data: {value}", 3000, self)
+        Qurderer.components.Notify(f"Session data: {value}", 3000, self)
 
 # Run the application
 if __name__ == "__main__":

@@ -10,10 +10,10 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, QTimer
 
 # Decorator for applying styles to PyQt5 widgets
-from ..Style import *
+from ...modules.Style import *
 
 # Class for creating Pixmap icons
-from ..Icon import *
+from ...modules.Icon import *
 
 # Importing style properties and configuration
 from .properties import STYLEBAR, STYLEPATH, STYLETCOLOR, ICONS
@@ -139,14 +139,14 @@ class Notify(QWidget):
 
         self.show()
 
-    def updatePosition(self):
+    def updatePosition(self) -> None:
         """Updates the notification's position relative to its parent window."""
         if self.parent:
             x = self.parent.x() + self.parent.width() - self.width() - 20
             y = self.parent.y() + 40 + (self.notificationCount - 1) * 80
             self.move(x, y)
 
-    def updateProgress(self):
+    def updateProgress(self) -> None:
         """Updates the progress bar and closes the notification when the duration ends."""
         self.elapsedTime += 30  
         self.progressBar.setValue(self.elapsedTime)
@@ -155,7 +155,7 @@ class Notify(QWidget):
             self.timer.stop()
             self.close()
 
-    def close(self):
+    def close(self) -> None:
         """Closes the notification and updates the notification count."""
         if self.parent in Notify.cont and Notify.cont[self.parent] > 0:
             Notify.cont[self.parent] -= 1

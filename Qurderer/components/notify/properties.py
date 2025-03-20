@@ -5,17 +5,17 @@ Modifying any property in this file requires making the same changes in related 
 """
 
 # Import a class to create Pixmap icons easily
-from ..Icon import Icon
+from ...modules import Icon
 
 # Location of the file with the styles for the Notify object
-STYLEPATH = "Qurderer/modules/notify/Notify.qss"
+STYLEPATH = "Qurderer/components/notify/Notify.css"
 """Path to the file containing the styles for the Notify object."""
 
 # References to create the default icons of the Notify class
 ICONS = {
-    "success": lambda: Icon("Qurderer/modules/notify/icons/check.png", 25, 25),
-    "error": lambda: Icon("Qurderer/modules/notify/icons/close.png", 25, 25),
-    "info": lambda: Icon("Qurderer/modules/notify/icons/information.png", 25, 25),
+    "success": lambda: Icon("Qurderer/components/notify/icons/check.png", 25, 25),
+    "error": lambda: Icon("Qurderer/components/notify/icons/close.png", 25, 25),
+    "info": lambda: Icon("Qurderer/components/notify/icons/information.png", 25, 25),
 }
 """
 Dictionary mapping notification types to their default icons.
