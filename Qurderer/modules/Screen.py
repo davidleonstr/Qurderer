@@ -87,6 +87,11 @@ def Screen(name: str, autoreloadUI: bool = False):
             Reloads the user interface by removing all existing layouts and
             re-executing the UI method after a short delay."
             """
+            if not hasattr(self, 'widgetParent'):
+                raise TypeError(f'The class {cls.__name__} must have a widgetParent attribute')
+            if not hasattr(cls, 'UI') or not callable(getattr(cls, 'UI')):
+                raise TypeError(f'The class {cls.__name__} must have a UI() method')
+            
             removeAllLayouts(self)
             QTimer.singleShot(0, lambda: self.UI(self.widgetParent))
 
