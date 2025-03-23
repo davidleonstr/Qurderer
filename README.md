@@ -12,6 +12,7 @@
 - **Session storage**: Provides an in-memory session storage system for managing temporary data.
 - **Notifications**: Includes a customizable notification system with different types (success, error, info) and progress bars.
 - **Floating Dialogs**: Provides a modal dialog system with a customizable backdrop, supporting both white and black themes.
+- **Automatic reload on screen display**: Provides an automatic UI recharge system.
 
 ---
 
@@ -25,6 +26,64 @@ cd Qurderer
 pip install .
 ```
 
+---
+
+## Example usage
+
+**MainWindow**
+```python
+import Qurderer
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMainWindow
+
+@Qurderer.MainWindow('Main Window', [100, 100, 600, 400], QIcon())
+class MyApp(QMainWindow):
+    def __init__(self):
+        """Initialize the main window and add screens."""
+        super().__init__()
+
+        # Add screen
+        screen = ScreenClass(self)
+        self.addScreen(screen)
+
+        # Set the initial screen
+        self.setScreen(screen.name)
+```
+
+**Screen**
+```python
+import Qurderer
+from PyQt5.QtWidgets import QWidget
+
+@Qurderer.Screen('screen', autoreloadUI=False) 
+"""
+AutoreloadUI = True if you need to reload the screen whenever it is displayed.
+"""
+class ScreenClass(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.widgetParent = parent # Necessary if autoreloadUI = true
+        self.UI(parent)
+
+    def UI(self, parent) -> None: # Necessary if autoreloadUI = true
+        """
+        The entire UI is loaded here.
+        """
+        pass
+```
+
+**Window**
+```python
+import Qurderer
+from PyQt5.QtWidgets import QMainWindow
+
+@Qurderer.Window('popup', 'Popup Window', [710, 100, 400, 150])
+class PopupWindow(QMainWindow):
+    def __init__(self, parent):
+        super().__init__(parent)
+```
+
+**Example**
 ```python
 """
 Main test application using Qurderer for PyQt5.
