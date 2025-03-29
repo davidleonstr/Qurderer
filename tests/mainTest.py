@@ -77,7 +77,7 @@ class MainScreen(QWidget):
 
         # Example of session storage
         self.sessionStorage.setItem('test<1>', 'hello world!')
-        sessionLabel = QLabel(f'Session data: {self.sessionStorage.getItem('test<1>')}')
+        sessionLabel = QLabel(f"Session data: {self.sessionStorage.getItem('test<1>')}")
         sessionLabel.setAlignment(Qt.AlignCenter)
 
         # Example of configuration
@@ -148,10 +148,10 @@ class OtherScreen(QWidget):
         label.setAlignment(Qt.AlignCenter)
 
         # Example of session storage
-        sessionLabel = QLabel(f'Session data test<1>: {self.sessionStorage.getItem('test<1>')}')
+        sessionLabel = QLabel(f"Session data test<1>: {self.sessionStorage.getItem('test<1>')}")
         sessionLabel.setAlignment(Qt.AlignCenter)
 
-        sessionTestReload = QLabel(f'Session data test<2>: {self.sessionStorage.getItem('test<2>')}')
+        sessionTestReload = QLabel(f"Session data test<2>: {self.sessionStorage.getItem('test<2>')}")
         sessionTestReload.setAlignment(Qt.AlignCenter)
 
         buttonReloadUI = QPushButton('Reload UI')
