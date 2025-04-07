@@ -15,7 +15,8 @@ class SessionStorage:
     A class that simulates session storage in memory.
 
     This class provides methods for storing, retrieving, and removing key-value pairs
-    in memory, which mimics a session storage mechanism.
+    in memory, which mimics a session storage mechanism. The storage is global across
+    all instances of the application.
 
     Attributes:
         _storage (dict): A dictionary to store session data.

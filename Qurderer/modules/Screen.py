@@ -5,6 +5,9 @@ The `Screen` decorator is used to assign a unique name to a screen class. This n
 be accessed through the `name` attribute of the decorated screen class. It also adds a 
 `screenName` class-level attribute to the decorated class. Additionally, when `autoreloadUI`
 is enabled, it ensures that the UI is properly reloaded upon screen display.
+   
+Note: The UI reload uses QTimer.singleShot with a delay of 0ms, which may introduce
+a slight delay in UI updates as it processes the event in the next event loop cycle.
 """
 
 from PyQt5.QtWidgets import QWidget
@@ -82,7 +85,11 @@ def Screen(name: str, autoreloadUI: bool = False):
         def reloadUI(self):
             """
             Reloads the user interface by removing all existing layouts and
-            re-executing the UI method after a short delay."
+            re-executing the UI method after a short delay.
+            
+            Note: The delay is implemented using QTimer.singleShot(0, ...) which
+            may introduce a slight delay in UI updates as it processes the event
+            in the next event loop cycle.
             """
             if not hasattr(self, 'widgetParent'):
                 raise TypeError(f'The class {cls.__name__} must have a widgetParent attribute')
@@ -100,7 +107,8 @@ def Screen(name: str, autoreloadUI: bool = False):
             originalShowEvent = getattr(cls, 'showEvent', QWidget.showEvent)
 
             def showEvent(self, event):
-                reloadUI(self)
+                # Reload the UI after a short delay. Note: This line cost me 5 hours of debugging.
+                QTimer.singleShot(0, lambda: reloadUI(self))
                 originalShowEvent(self, event)
 
             cls.showEvent = showEvent

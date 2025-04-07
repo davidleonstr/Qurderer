@@ -27,7 +27,7 @@ class Dialog(QFrame):
             parent, 
             children: QVBoxLayout | QHBoxLayout = None, 
             color: str = 'white', 
-            fixedSize: list = [300, 200],
+            fixedSize: list[int] = [300, 200],
             backdrop: str = 'background-color: rgba(0, 0, 0, 0.5);'
         ):
         """

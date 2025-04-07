@@ -57,6 +57,7 @@ class MyApp(QMainWindow):
 
         # Create a popup window
         self.createWindow(PopupWindow(self))
+        self.createWindow(OtherPopupWindow(self))
 
 @Qurderer.Screen('main')
 @Qurderer.useConfig(config)
@@ -66,6 +67,7 @@ class MainScreen(QWidget):
     def __init__(self, parent):
         """Initialize the main screen's UI elements and session storage."""
         super().__init__(parent)
+        self.widgetParent = parent
         self.UI(parent)
 
     def UI(self, parent) -> None:
@@ -174,14 +176,35 @@ class OtherScreen(QWidget):
 @Qurderer.Window('popup', 'Popup Window', [710, 100, 400, 150], QIcon(), resizable=False)
 @Qurderer.useSessionStorage()
 class PopupWindow(QMainWindow):
-    """Popup window with buttons and session management."""
+    """Popup window with screen management and session storage."""
     def __init__(self, parent):
-        """Initialize the popup window's UI elements."""
+        """Initialize the popup window with screen management."""
         super().__init__(parent)
-        self.parent = parent
+        self.mainWindow = parent
 
-        # Main layout
-        layout = QVBoxLayout()
+        # Create and add the main popup screen
+        self.mainScreen = PopupMainScreen(self)
+        self.addScreen(self.mainScreen)
+        self.setScreen(self.mainScreen.name)
+
+    def closePopup(self):
+        """Close the popup window."""
+        self.mainWindow.closeWindow(self.name)
+
+@Qurderer.Screen('popup-main')
+@Qurderer.useSessionStorage()
+class PopupMainScreen(QWidget):
+    """Main screen for the popup window."""
+    def __init__(self, parent):
+        """Initialize the popup main screen."""
+        super().__init__(parent)
+        self.widgetParent = parent
+        self.UI(parent)
+
+    def UI(self, parent) -> None:
+        """Set up the user interface."""
+        # Crear el layout principal
+        mainLayout = QVBoxLayout()
 
         # UI elements
         label = QLabel('This is a popup window')
@@ -189,30 +212,75 @@ class PopupWindow(QMainWindow):
 
         # Button to close the popup window
         buttonClose = QPushButton('Close Popup')
-        buttonClose.clicked.connect(self.closePopup)
+        buttonClose.clicked.connect(parent.closePopup)
 
         # Button to get session data
         buttonGetSession = QPushButton('Get Session Data')
         buttonGetSession.clicked.connect(self.showSessionData)
 
+        # Example of ToggleSwitch
+        toggle = Qurderer.components.ToggleSwitch(self, checked=True)
+
         # Add widgets to the layout
-        layout.addWidget(label)
-        layout.addWidget(buttonClose)
-        layout.addWidget(buttonGetSession)
+        mainLayout.addWidget(label)
+        mainLayout.addWidget(buttonClose)
+        mainLayout.addWidget(buttonGetSession)
+        mainLayout.addWidget(toggle)
 
         # Set the layout
-        container = QWidget()
-        container.setLayout(layout)
-        self.setCentralWidget(container)
-
-    def closePopup(self):
-        """Close the popup window."""
-        self.parent.closeWindow(self.name)
+        self.setLayout(mainLayout)
 
     def showSessionData(self):
         """Show session data in a notification."""
         value = self.sessionStorage.getItem('test<1>')
-        Qurderer.components.Notify(f'Session data: {value}', 3000, self)
+        Qurderer.components.Notify(f'Session data: {value}', 3000, self.widgetParent)
+
+@Qurderer.Window('otherpopup', 'Other Popup Window', [710, 285, 400, 150], QIcon(), resizable=False)
+@Qurderer.useSessionStorage()
+class OtherPopupWindow(QMainWindow):
+    """Popup window with screen management."""
+    def __init__(self, parent):
+        """Initialize the popup window with screen management."""
+        super().__init__(parent)
+        self.mainWindow = parent
+
+        # Add and set initial screen
+        self.mainScreen = OtherNoneScreen(self)
+        self.addScreen(self.mainScreen)
+        self.setScreen(self.mainScreen.name)
+
+    def closePopup(self):
+        """Close the popup window."""
+        self.mainWindow.closeWindow(self.name)
+
+@Qurderer.Screen('other-none', autoreloadUI=True)
+@Qurderer.useSessionStorage()
+class OtherNoneScreen(QWidget):
+    """Screen for the other popup window."""
+    def __init__(self, parent):
+        """Initialize the screen."""
+        super().__init__(parent)
+        self.widgetParent = parent
+        self.UI(parent)
+
+    def UI(self, parent) -> None:
+        """Set up the user interface."""
+        # Crear el layout principal
+        mainLayout = QVBoxLayout()
+
+        # UI elements
+        label = QLabel('Other-none Screen')
+        label.setAlignment(Qt.AlignCenter)
+
+        buttonReloadUI = QPushButton('Reload UI')
+        buttonReloadUI.clicked.connect(self.reloadUI)
+
+        # Add widgets to the layout
+        mainLayout.addWidget(label)
+        mainLayout.addWidget(buttonReloadUI)
+
+        # Set the layout
+        self.setLayout(mainLayout)
 
 # Run the application
 if __name__ == "__main__":

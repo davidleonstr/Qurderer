@@ -13,7 +13,7 @@ from PyQt5.QtCore import QTimer, Qt
 
 def MainWindow(
         title: str, 
-        geometry: list, 
+        geometry: list[int], 
         icon: QIcon, 
         resizable: bool = True, 
         maximizable: bool = True
@@ -83,22 +83,22 @@ def MainWindow(
             """
             Adds a screen widget to the main window's stacked widget.
 
-            This method checks that the screen has a valid 'name' attribute and adds it 
+            This method checks that the screen has a valid 'screenName' attribute and adds it 
             to the stacked widget for navigation.
 
             Args:
                 screen (QWidget): The screen widget to add to the stacked widget.
 
             Raises:
-                Exception: If the screen does not have a 'name' attribute.
+                Exception: If the screen does not have a 'screenName' attribute.
             """
             if not hasattr(cls, 'screens'):
                 cls.screens = {}
 
-            if not hasattr(screen, 'ScreenName'):
-                name = screen.screenName
-                cls.screens[name] = screen
-            else:
+            name = screen.screenName
+            cls.screens[name] = screen
+            
+            if not hasattr(screen, 'name'):
                 raise Exception(f'{screen} does not have name <name>.')
             
             if hasattr(cls, 'stackedScreens'):
@@ -107,6 +107,9 @@ def MainWindow(
         def setScreen(self, name: str) -> None:
             """
             Sets the current screen to display based on the screen name.
+
+            This method accepts a string name that must match the 'screenName' attribute
+            of a previously added screen.
 
             Args:
                 name (str): The name of the screen to display.

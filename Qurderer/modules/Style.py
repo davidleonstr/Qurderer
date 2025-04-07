@@ -60,6 +60,7 @@ def Style(style: str, path: bool = False):
             Reads the stylesheet from a file.
 
             This method reads the content of the given file and returns it as a string.
+            It uses the GenericFile utility class to read the file content.
 
             Args:
                 style (str): The file path to the stylesheet.

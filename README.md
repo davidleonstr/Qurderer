@@ -1,18 +1,44 @@
 # Qurderer
 
-**Qurderer** is a Python package designed to simplify the management of windows, screens, styles, global configurations, and session storage in PyQt5 applications. It provides a set of decorators and utilities that make it easier to create and manage simple graphical interfaces.
+**Qurderer** is a powerful Python framework for building modern PyQt5 applications with a focus on simplicity and maintainability. It provides a comprehensive set of decorators and utilities that streamline the development of complex desktop interfaces by abstracting away common patterns and boilerplate code.
+
+The framework is designed to address the challenges of managing multiple windows, screens, and application state in PyQt5 applications. By leveraging decorators and a consistent architecture, Qurderer enables developers to create robust applications with less code and better organization.
 
 ---
 
 ## Key Features
 
-- **Window and screen management**: Allows the creation and navigation between multiple screens and windows.
-- **Custom styles**: Applies styles to windows and widgets using stylesheets (CSS) or directly from files.
-- **Global configuration**: Injects global configurations into classes that require them.
-- **Session storage**: Provides an in-memory session storage system for managing temporary data.
-- **Notifications**: Includes a customizable notification system with different types (success, error, info) and progress bars.
-- **Floating Dialogs**: Provides a modal dialog system with a customizable backdrop, supporting both white and black themes.
-- **Automatic reload on screen display**: Provides an automatic UI recharge system.
+- **Window Management**:
+  - Create and manage multiple windows with the `@Window` decorator
+  - Build main application windows with the `@MainWindow` decorator
+  - Navigate between windows with history tracking
+  - Customize window properties (size, position, resizability)
+
+- **Screen Management**:
+  - Create and navigate between multiple screens with the `@Screen` decorator
+  - Automatic screen transitions with history tracking
+  - Support for screen-specific layouts and widgets
+  - Optional automatic UI reload when screens are displayed
+
+- **Style Management**:
+  - Apply styles to windows and widgets using the `@Style` decorator
+  - Support for both file-based and string-based stylesheets
+  - Theme color customization for consistent UI
+
+- **Configuration Management**:
+  - Inject global configurations with the `@useConfig` decorator
+  - Access application settings from any component
+  - Centralized configuration management
+
+- **Session Storage**:
+  - In-memory session storage with the `@useSessionStorage` decorator
+  - Store and retrieve temporary data between screens
+  - Persistent data management during application runtime
+
+- **UI Components**:
+  - **Notifications**: Customizable notification system with different types (success, error, info) and progress bars
+  - **Floating Dialogs**: Modal dialog system with customizable backdrop, supporting both white and black themes
+  - **Toggle Switch**: Animated toggle switch component with customizable appearance
 
 ---
 
@@ -36,15 +62,17 @@ pip install -e .
 
 ## Example usage
 
-**MainWindow**
+### Main Window Setup
+
 ```python
 import Qurderer
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QWidget
 from typing import Callable
 
-@Qurderer.MainWindow('Main Window', [100, 100, 600, 400], QIcon(), resizable=True, maximizable=True) # resizable, maximizable -> optional
+@Qurderer.MainWindow('Main Window', [100, 100, 600, 400], QIcon(), resizable=True, maximizable=True)
 class MyApp(QMainWindow):
+    # Type hints for better IDE support
     title: str
     windowGeometry: list
     icon: QIcon
@@ -70,39 +98,43 @@ class MyApp(QMainWindow):
         self.setScreen(screen.name)
 ```
 
-**Screen**
+### Screen Definition
+
 ```python
 import Qurderer
 from PyQt5.QtWidgets import QWidget
 from typing import Callable
 
 @Qurderer.Screen('screen', autoreloadUI=False) 
-# AutoreloadUI = True if you need to reload the screen whenever it is displayed.
 class ScreenClass(QWidget):
+    # Type hints for better IDE support
     name: str
     screenName: str
     reloadUI: Callable[[], None]
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.widgetParent = parent # Necessary if autoreloadUI = true
+        self.widgetParent = parent  # Necessary if autoreloadUI = true
         self.UI(parent)
 
-    def UI(self, parent) -> None: # Necessary if autoreloadUI = true
+    def UI(self, parent) -> None:  # Necessary if autoreloadUI = true
         """
         The entire UI is loaded here.
         """
         pass
 ```
 
-**Window**
+### Popup Window
+
 ```python
 import Qurderer
 from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtGui import QIcon
 from typing import List
 
-@Qurderer.Window('popup', 'Popup Window', [710, 100, 400, 150], QIcon(), resizable=False) # resizable -> optional
+@Qurderer.Window('popup', 'Popup Window', [710, 100, 400, 150], QIcon(), resizable=False)
 class PopupWindow(QMainWindow):
+    # Type hints for better IDE support
     name: str
     title: str
     windowGeometry: List[int]
@@ -112,7 +144,8 @@ class PopupWindow(QMainWindow):
         super().__init__(parent)
 ```
 
-**Example**
+### Complete Application Example
+
 ```python
 import Qurderer
 import sys
@@ -173,6 +206,7 @@ class MyApp(QMainWindow):
 
         # Create a popup window
         self.createWindow(PopupWindow(self))
+        self.createWindow(OtherPopupWindow(self))
 
 @Qurderer.Screen('main')
 @Qurderer.useConfig(config)
@@ -182,6 +216,7 @@ class MainScreen(QWidget):
     def __init__(self, parent):
         """Initialize the main screen's UI elements and session storage."""
         super().__init__(parent)
+        self.widgetParent = parent
         self.UI(parent)
 
     def UI(self, parent) -> None:
@@ -290,14 +325,35 @@ class OtherScreen(QWidget):
 @Qurderer.Window('popup', 'Popup Window', [710, 100, 400, 150], QIcon(), resizable=False)
 @Qurderer.useSessionStorage()
 class PopupWindow(QMainWindow):
-    """Popup window with buttons and session management."""
+    """Popup window with screen management and session storage."""
     def __init__(self, parent):
-        """Initialize the popup window's UI elements."""
+        """Initialize the popup window with screen management."""
         super().__init__(parent)
-        self.parent = parent
+        self.mainWindow = parent
 
-        # Main layout
-        layout = QVBoxLayout()
+        # Create and add the main popup screen
+        self.mainScreen = PopupMainScreen(self)
+        self.addScreen(self.mainScreen)
+        self.setScreen(self.mainScreen.name)
+
+    def closePopup(self):
+        """Close the popup window."""
+        self.mainWindow.closeWindow(self.name)
+
+@Qurderer.Screen('popup-main')
+@Qurderer.useSessionStorage()
+class PopupMainScreen(QWidget):
+    """Main screen for the popup window."""
+    def __init__(self, parent):
+        """Initialize the popup main screen."""
+        super().__init__(parent)
+        self.widgetParent = parent
+        self.UI(parent)
+
+    def UI(self, parent) -> None:
+        """Set up the user interface."""
+        # Crear el layout principal
+        mainLayout = QVBoxLayout()
 
         # UI elements
         label = QLabel('This is a popup window')
@@ -305,30 +361,75 @@ class PopupWindow(QMainWindow):
 
         # Button to close the popup window
         buttonClose = QPushButton('Close Popup')
-        buttonClose.clicked.connect(self.closePopup)
+        buttonClose.clicked.connect(parent.closePopup)
 
         # Button to get session data
         buttonGetSession = QPushButton('Get Session Data')
         buttonGetSession.clicked.connect(self.showSessionData)
 
+        # Example of ToggleSwitch
+        toggle = Qurderer.components.ToggleSwitch(self, checked=True)
+
         # Add widgets to the layout
-        layout.addWidget(label)
-        layout.addWidget(buttonClose)
-        layout.addWidget(buttonGetSession)
+        mainLayout.addWidget(label)
+        mainLayout.addWidget(buttonClose)
+        mainLayout.addWidget(buttonGetSession)
+        mainLayout.addWidget(toggle)
 
         # Set the layout
-        container = QWidget()
-        container.setLayout(layout)
-        self.setCentralWidget(container)
-
-    def closePopup(self):
-        """Close the popup window."""
-        self.parent.closeWindow(self.name)
+        self.setLayout(mainLayout)
 
     def showSessionData(self):
         """Show session data in a notification."""
         value = self.sessionStorage.getItem('test<1>')
-        Qurderer.components.Notify(f'Session data: {value}', 3000, self)
+        Qurderer.components.Notify(f'Session data: {value}', 3000, self.widgetParent)
+
+@Qurderer.Window('otherpopup', 'Other Popup Window', [710, 285, 400, 150], QIcon(), resizable=False)
+@Qurderer.useSessionStorage()
+class OtherPopupWindow(QMainWindow):
+    """Popup window with screen management."""
+    def __init__(self, parent):
+        """Initialize the popup window with screen management."""
+        super().__init__(parent)
+        self.mainWindow = parent
+
+        # Add and set initial screen
+        self.mainScreen = OtherNoneScreen(self)
+        self.addScreen(self.mainScreen)
+        self.setScreen(self.mainScreen.name)
+
+    def closePopup(self):
+        """Close the popup window."""
+        self.mainWindow.closeWindow(self.name)
+
+@Qurderer.Screen('other-none', autoreloadUI=True)
+@Qurderer.useSessionStorage()
+class OtherNoneScreen(QWidget):
+    """Screen for the other popup window."""
+    def __init__(self, parent):
+        """Initialize the screen."""
+        super().__init__(parent)
+        self.widgetParent = parent
+        self.UI(parent)
+
+    def UI(self, parent) -> None:
+        """Set up the user interface."""
+        # Crear el layout principal
+        mainLayout = QVBoxLayout()
+
+        # UI elements
+        label = QLabel('Other-none Screen')
+        label.setAlignment(Qt.AlignCenter)
+
+        buttonReloadUI = QPushButton('Reload UI')
+        buttonReloadUI.clicked.connect(self.reloadUI)
+
+        # Add widgets to the layout
+        mainLayout.addWidget(label)
+        mainLayout.addWidget(buttonReloadUI)
+
+        # Set the layout
+        self.setLayout(mainLayout)
 
 # Run the application
 if __name__ == "__main__":
