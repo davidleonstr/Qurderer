@@ -51,7 +51,7 @@ git clone https://github.com/davidleonstr/Qurderer.git
 cd Qurderer
 pip install .
 ```
-### Or (Dev)
+**Or for development:**
 ```bash
 git clone https://github.com/davidleonstr/Qurderer.git
 cd Qurderer
