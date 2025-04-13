@@ -3,7 +3,7 @@ This module defines a simple in-memory session storage class and a decorator to 
 this session storage into a class.
 
 The `SessionStorage` class provides methods for storing, retrieving, and removing 
-items from a session. The `useSessionStorage` decorator adds a `sessionStorage` 
+items from a session. The `UseSessionStorage` decorator adds a `SessionStorage` 
 attribute to a class, which allows easy access to the session storage.
 """
 
@@ -58,15 +58,15 @@ class SessionStorage:
 # Create a global sessionStorage instance
 sessionStorage = SessionStorage()
 
-def useSessionStorage():
+def UseSessionStorage():
     """
     A decorator that injects session storage into a class.
 
-    This decorator adds a `sessionStorage` attribute to the class, making it 
+    This decorator adds a `SessionStorage` attribute to the class, making it 
     accessible from instances of the class.
 
     Returns:
-        decorator: A class decorator that adds the `sessionStorage` attribute.
+        decorator: A class decorator that adds the `SessionStorage` attribute.
     """
 
     def decorator(cls):
@@ -77,7 +77,7 @@ def useSessionStorage():
             cls: The class to decorate.
 
         Returns:
-            cls: The decorated class with the `sessionStorage` attribute.
+            cls: The decorated class with the `SessionStorage` attribute.
         """
         originalInit = cls.__init__
 
@@ -90,11 +90,11 @@ def useSessionStorage():
                 **kwargs: Keyword arguments passed to the original class initializer.
             """
             originalInit(self, *args, **kwargs)
-            self.sessionStorage = sessionStorage
+            self.SessionStorage = sessionStorage
 
         cls.__init__ = newInit
 
-        cls.sessionStorage = sessionStorage
+        cls.SessionStorage = sessionStorage
 
         return cls
     

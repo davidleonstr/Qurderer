@@ -26,12 +26,12 @@ The framework is designed to address the challenges of managing multiple windows
   - Theme color customization for consistent UI
 
 - **Configuration Management**:
-  - Inject global configurations with the `@useConfig` decorator
+  - Inject global configurations with the `@UseConfig` decorator
   - Access application settings from any component
   - Centralized configuration management
 
 - **Session Storage**:
-  - In-memory session storage with the `@useSessionStorage` decorator
+  - In-memory session storage with the `@UseSessionStorage` decorator
   - Store and retrieve temporary data between screens
   - Persistent data management during application runtime
 
@@ -154,7 +154,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from dataclasses import dataclass
 
-# Example of useStyle
+# Example of Style
 style = '''
 QPushButton {
     background-color: #007BFF;
@@ -187,8 +187,8 @@ config = Config()
 
 @Qurderer.MainWindow('Main Window', [100, 100, 600, 400], QIcon())
 @Qurderer.Style(style)
-@Qurderer.useConfig(config)
-@Qurderer.useSessionStorage()
+@Qurderer.UseConfig(config)
+@Qurderer.UseSessionStorage()
 class MyApp(QMainWindow):
     """Main window for the application that manages multiple screens and notifications."""
     def __init__(self):
@@ -209,8 +209,8 @@ class MyApp(QMainWindow):
         self.createWindow(OtherPopupWindow(self))
 
 @Qurderer.Screen('main')
-@Qurderer.useConfig(config)
-@Qurderer.useSessionStorage()
+@Qurderer.UseConfig(config)
+@Qurderer.UseSessionStorage()
 class MainScreen(QWidget):
     """Main screen with session storage and button interaction."""
     def __init__(self, parent):
@@ -227,8 +227,8 @@ class MainScreen(QWidget):
         label.setAlignment(Qt.AlignCenter)
 
         # Example of session storage
-        self.sessionStorage.setItem('test<1>', 'hello world!')
-        sessionLabel = QLabel(f"Session data: {self.sessionStorage.getItem('test<1>')}")
+        self.SessionStorage.setItem('test<1>', 'hello world!')
+        sessionLabel = QLabel(f"Session data: {self.SessionStorage.getItem('test<1>')}")
         sessionLabel.setAlignment(Qt.AlignCenter)
 
         # Example of configuration
@@ -265,7 +265,7 @@ class MainScreen(QWidget):
         buttonOpenDialog.clicked.connect(dialog.show)
 
         buttonSetSessionData = QPushButton('Set test<2>')
-        buttonSetSessionData.clicked.connect(lambda: self.sessionStorage.setItem('test<2>', 'hello world!'))
+        buttonSetSessionData.clicked.connect(lambda: self.SessionStorage.setItem('test<2>', 'hello world!'))
         
         # Add widgets to the layout
         layout.addWidget(label)
@@ -282,7 +282,7 @@ class MainScreen(QWidget):
         self.setLayout(layout)
 
 @Qurderer.Screen('other', autoreloadUI=True)
-@Qurderer.useSessionStorage()
+@Qurderer.UseSessionStorage()
 class OtherScreen(QWidget):
     """Secondary screen with session storage and navigation."""
     def __init__(self, parent):
@@ -299,10 +299,10 @@ class OtherScreen(QWidget):
         label.setAlignment(Qt.AlignCenter)
 
         # Example of session storage
-        sessionLabel = QLabel(f"Session data test<1>: {self.sessionStorage.getItem('test<1>')}")
+        sessionLabel = QLabel(f"Session data test<1>: {self.SessionStorage.getItem('test<1>')}")
         sessionLabel.setAlignment(Qt.AlignCenter)
 
-        sessionTestReload = QLabel(f"Session data test<2>: {self.sessionStorage.getItem('test<2>')}")
+        sessionTestReload = QLabel(f"Session data test<2>: {self.SessionStorage.getItem('test<2>')}")
         sessionTestReload.setAlignment(Qt.AlignCenter)
 
         buttonReloadUI = QPushButton('Reload UI')
@@ -323,7 +323,7 @@ class OtherScreen(QWidget):
         self.setLayout(layout)
 
 @Qurderer.Window('popup', 'Popup Window', [710, 100, 400, 150], QIcon(), resizable=False)
-@Qurderer.useSessionStorage()
+@Qurderer.UseSessionStorage()
 class PopupWindow(QMainWindow):
     """Popup window with screen management and session storage."""
     def __init__(self, parent):
@@ -341,7 +341,7 @@ class PopupWindow(QMainWindow):
         self.mainWindow.closeWindow(self.name)
 
 @Qurderer.Screen('popup-main')
-@Qurderer.useSessionStorage()
+@Qurderer.UseSessionStorage()
 class PopupMainScreen(QWidget):
     """Main screen for the popup window."""
     def __init__(self, parent):
@@ -381,11 +381,11 @@ class PopupMainScreen(QWidget):
 
     def showSessionData(self):
         """Show session data in a notification."""
-        value = self.sessionStorage.getItem('test<1>')
+        value = self.SessionStorage.getItem('test<1>')
         Qurderer.components.Notify(f'Session data: {value}', 3000, self.widgetParent)
 
 @Qurderer.Window('otherpopup', 'Other Popup Window', [710, 285, 400, 150], QIcon(), resizable=False)
-@Qurderer.useSessionStorage()
+@Qurderer.UseSessionStorage()
 class OtherPopupWindow(QMainWindow):
     """Popup window with screen management."""
     def __init__(self, parent):
@@ -403,7 +403,7 @@ class OtherPopupWindow(QMainWindow):
         self.mainWindow.closeWindow(self.name)
 
 @Qurderer.Screen('other-none', autoreloadUI=True)
-@Qurderer.useSessionStorage()
+@Qurderer.UseSessionStorage()
 class OtherNoneScreen(QWidget):
     """Screen for the other popup window."""
     def __init__(self, parent):
