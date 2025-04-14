@@ -160,10 +160,13 @@ The `useState` function provides React-like state management with getter, setter
 
 ```python
 from Qurderer.stores import useState
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
 
+@Qurderer.Screen('screen') 
 class MyScreen(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
+        self.widgetParent = parent
         
         # Create state with initial value
         self.count, self.setCount, self.subscribeCount = useState(0)
@@ -206,13 +209,16 @@ The `Subscribeable` class implements the Observer pattern for global state manag
 
 ```python
 from Qurderer.stores import Subscribeable
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
 
 # Create a global subscribeable
 counter = Subscribeable(0)
 
+@Qurderer.Screen('screen') 
 class MyScreen(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
+        self.widgetParent = parent
         
         # Subscribe to counter changes
         counter.subscribe(self.onCounterChange)
@@ -252,13 +258,16 @@ You can combine both approaches for a powerful state management system:
 
 ```python
 from Qurderer.stores import useState, Subscribeable
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit
 
 # Global state
 user = Subscribeable({"name": "Guest", "loggedIn": False})
 
+@Qurderer.Screen('login-screen') 
 class LoginScreen(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
+        self.widgetParent = parent
         
         # Local state
         self.username, self.setUsername, self.subscribeUsername = useState("")
