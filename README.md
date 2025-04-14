@@ -40,6 +40,12 @@ The framework is designed to address the challenges of managing multiple windows
   - **Floating Dialogs**: Modal dialog system with customizable backdrop, supporting both white and black themes
   - **Toggle Switch**: Animated toggle switch component with customizable appearance
 
+- **State Management**:
+  - **useState**: React-like state management with getter, setter, and subscriber functions
+  - **Subscribeable**: Observable pattern implementation for global state management
+  - **Session Storage**: In-memory storage for temporary data between screens
+  - **Configuration**: Global configuration injection for application settings
+
 ---
 
 ## Installation
@@ -144,15 +150,187 @@ class PopupWindow(QMainWindow):
         super().__init__(parent)
 ```
 
+### State Management Examples
+
+Qurderer provides powerful state management tools inspired by React's hooks and the Observable pattern. Here are examples of how to use them:
+
+#### useState Example
+
+The `useState` function provides React-like state management with getter, setter, and subscriber functions:
+
+```python
+from Qurderer.stores import useState
+
+class MyScreen(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        
+        # Create state with initial value
+        self.count, self.setCount, self.subscribeCount = useState(0)
+        
+        # Subscribe to state changes
+        self.subscribeCount(self.onCountChange)
+        
+        # Create UI
+        self.UI(parent)
+        
+        # Update UI with initial value
+        self.countLabel.setText(f"Count: {self.count()}")
+    
+    def UI(self, parent):
+        layout = QVBoxLayout()
+        
+        # Display current count
+        self.countLabel = QLabel(f"Count: {self.count()}")
+        
+        # Button to increment count
+        button = QPushButton("Increment")
+        button.clicked.connect(self.incrementCount)
+        
+        layout.addWidget(self.countLabel)
+        layout.addWidget(button)
+        self.setLayout(layout)
+    
+    def incrementCount(self):
+        # Update state
+        self.setCount(self.count() + 1)
+    
+    def onCountChange(self, newValue):
+        # Update UI when state changes
+        self.countLabel.setText(f"Count: {newValue}")
+```
+
+#### Subscribeable Example
+
+The `Subscribeable` class implements the Observer pattern for global state management:
+
+```python
+from Qurderer.stores import Subscribeable
+
+# Create a global subscribeable
+counter = Subscribeable(0)
+
+class MyScreen(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        
+        # Subscribe to counter changes
+        counter.subscribe(self.onCounterChange)
+        
+        # Create UI
+        self.UI(parent)
+        
+        # Update UI with initial value
+        self.counterLabel.setText(f"Counter: {counter.value}")
+    
+    def UI(self, parent):
+        layout = QVBoxLayout()
+        
+        # Display current counter value
+        self.counterLabel = QLabel(f"Counter: {counter.value}")
+        
+        # Button to increment counter
+        button = QPushButton("Increment")
+        button.clicked.connect(self.incrementCounter)
+        
+        layout.addWidget(self.counterLabel)
+        layout.addWidget(button)
+        self.setLayout(layout)
+    
+    def incrementCounter(self):
+        # Update global counter
+        counter.value = counter.value + 1
+    
+    def onCounterChange(self, newValue):
+        # Update UI when counter changes
+        self.counterLabel.setText(f"Counter: {newValue}")
+```
+
+#### Combining useState and Subscribeable
+
+You can combine both approaches for a powerful state management system:
+
+```python
+from Qurderer.stores import useState, Subscribeable
+
+# Global state
+user = Subscribeable({"name": "Guest", "loggedIn": False})
+
+class LoginScreen(QWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        
+        # Local state
+        self.username, self.setUsername, self.subscribeUsername = useState("")
+        self.password, self.setPassword, _ = useState("")
+        
+        # Subscribe to changes
+        self.subscribeUsername(self.onUsernameChange)
+        user.subscribe(self.onUserChange)
+        
+        # Create UI
+        self.UI(parent)
+    
+    def UI(self, parent):
+        layout = QVBoxLayout()
+        
+        # Username input
+        usernameInput = QLineEdit(self.username())
+        usernameInput.textChanged.connect(self.setUsername)
+        
+        # Password input
+        passwordInput = QLineEdit(self.password())
+        passwordInput.setEchoMode(QLineEdit.Password)
+        passwordInput.textChanged.connect(self.setPassword)
+        
+        # Login button
+        loginButton = QPushButton("Login")
+        loginButton.clicked.connect(self.login)
+        
+        # Status label
+        self.statusLabel = QLabel("Not logged in")
+        
+        layout.addWidget(QLabel("Username:"))
+        layout.addWidget(usernameInput)
+        layout.addWidget(QLabel("Password:"))
+        layout.addWidget(passwordInput)
+        layout.addWidget(loginButton)
+        layout.addWidget(self.statusLabel)
+        
+        self.setLayout(layout)
+    
+    def login(self):
+        # Example login logic
+        if self.username() == "admin" and self.password() == "password":
+            # Update global user state
+            user.value = {"name": self.username(), "loggedIn": True}
+        else:
+            self.statusLabel.setText("Invalid credentials")
+    
+    def onUsernameChange(self, newValue):
+        # Update UI based on local state
+        if newValue == "admin":
+            self.statusLabel.setText("Admin user detected")
+    
+    def onUserChange(self, newValue):
+        # Update UI based on global state
+        if newValue["loggedIn"]:
+            self.statusLabel.setText(f"Logged in as {newValue['name']}")
+```
+
 ### Complete Application Example
+
+<details>
+<summary>Click to expand the complete application example.</summary>
 
 ```python
 import Qurderer
 import sys
-from PyQt5.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget, QPushButton, QMainWindow
+from PyQt5.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget, QPushButton, QMainWindow, QHBoxLayout, QSpinBox, QLineEdit
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from dataclasses import dataclass
+from Qurderer.stores import useState, Subscribeable
 
 # Example of Style
 style = '''
@@ -175,6 +353,13 @@ QLabel {
     font-size: 16px;
     font-weight: semibold; 
 }
+
+QSpinBox, QLineEdit {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
 '''
 
 # Configuration example class
@@ -185,7 +370,10 @@ class Config:
 # Global config
 config = Config()
 
-@Qurderer.MainWindow('Main Window', [100, 100, 600, 400], QIcon())
+# Example of Subscribeable
+counter = Qurderer.stores.Subscribeable(0)
+
+@Qurderer.MainWindow('Main Window', [100, 100, 800, 600], QIcon())
 @Qurderer.Style(style)
 @Qurderer.UseConfig(config)
 @Qurderer.UseSessionStorage()
@@ -198,8 +386,10 @@ class MyApp(QMainWindow):
         # Add screens
         mainScreen = MainScreen(self)
         otherScreen = OtherScreen(self)
+        storeScreen = StoreScreen(self)
         self.addScreen(mainScreen)
         self.addScreen(otherScreen)
+        self.addScreen(storeScreen)
 
         # Set the initial screen
         self.setScreen(mainScreen.name)
@@ -242,6 +432,10 @@ class MainScreen(QWidget):
         # Button to navigate to another screen
         buttonNavigate = QPushButton('Go to Other Screen')
         buttonNavigate.clicked.connect(lambda: parent.setScreen('other'))
+        
+        # Button to navigate to store screen
+        buttonStore = QPushButton('Go to Store Screen')
+        buttonStore.clicked.connect(lambda: parent.setScreen('store'))
 
         # Button to open a popup window
         buttonPopup = QPushButton('Open Popup')
@@ -273,6 +467,7 @@ class MainScreen(QWidget):
         layout.addWidget(sessionLabel)
         layout.addWidget(buttonNotify)
         layout.addWidget(buttonNavigate)
+        layout.addWidget(buttonStore)
         layout.addWidget(buttonPopup)
         layout.addWidget(buttonClosePopup)
         layout.addWidget(buttonOpenDialog)
@@ -311,16 +506,135 @@ class OtherScreen(QWidget):
         # Button to navigate back to the main screen
         buttonBack = QPushButton('Go Back to Main Screen')
         buttonBack.clicked.connect(lambda: parent.setScreen('main'))
+        
+        # Button to navigate to store screen
+        buttonStore = QPushButton('Go to Store Screen')
+        buttonStore.clicked.connect(lambda: parent.setScreen('store'))
 
         # Add widgets to the layout
         layout.addWidget(label)
         layout.addWidget(sessionLabel)
         layout.addWidget(sessionTestReload)
         layout.addWidget(buttonBack)
+        layout.addWidget(buttonStore)
         layout.addWidget(buttonReloadUI)
 
         # Set the layout
         self.setLayout(layout)
+
+@Qurderer.Screen('store')
+class StoreScreen(QWidget):
+    """Screen demonstrating the use of useState and Subscribeable."""
+    def __init__(self, parent):
+        """Initialize the store screen with useState and Subscribeable examples."""
+        super().__init__(parent)
+        self.widgetParent = parent
+        
+        # Create useState examples
+        self.count, self.setCount, self.subscribeCount = Qurderer.stores.useState(0)
+        self.text, self.setText, self.subscribeText = Qurderer.stores.useState("Hello from useState!")
+        
+        # Subscribe to counter changes
+        counter.subscribe(self.onCounterChange)
+        
+        # Create UI
+        self.UI(parent)
+        
+        # Subscribe to state changes
+        self.subscribeCount(self.onCountChange)
+        self.subscribeText(self.onTextChange)
+        
+        # Update UI with initial values
+        self.countLabel.setText(f"Count: {self.count()}")
+        self.textLabel.setText(f"Text: {self.text()}")
+        self.counterLabel.setText(f"Counter: {counter.value}")
+
+    def UI(self, parent) -> None:
+        """Set up the user interface for the store screen."""
+        mainLayout = QVBoxLayout()
+        
+        # Title
+        title = QLabel('Store Examples')
+        title.setAlignment(Qt.AlignCenter)
+        mainLayout.addWidget(title)
+        
+        # useState example section
+        useStateSection = QVBoxLayout()
+        useStateTitle = QLabel('useState Example')
+        useStateTitle.setAlignment(Qt.AlignCenter)
+        useStateSection.addWidget(useStateTitle)
+        
+        # Count example
+        countLayout = QHBoxLayout()
+        self.countLabel = QLabel(f"Count: {self.count()}")
+        countButton = QPushButton("Increment Count")
+        countButton.clicked.connect(self.incrementCount)
+        countLayout.addWidget(self.countLabel)
+        countLayout.addWidget(countButton)
+        useStateSection.addLayout(countLayout)
+        
+        # Text example
+        textLayout = QHBoxLayout()
+        self.textLabel = QLabel(f"Text: {self.text()}")
+        textInput = QLineEdit(self.text())
+        textInput.textChanged.connect(self.setText)
+        textLayout.addWidget(self.textLabel)
+        textLayout.addWidget(textInput)
+        useStateSection.addLayout(textLayout)
+        
+        mainLayout.addLayout(useStateSection)
+        
+        # Subscribeable example section
+        subscribeableSection = QVBoxLayout()
+        subscribeableTitle = QLabel('Subscribeable Example')
+        subscribeableTitle.setAlignment(Qt.AlignCenter)
+        subscribeableSection.addWidget(subscribeableTitle)
+        
+        # Counter example
+        counterLayout = QHBoxLayout()
+        self.counterLabel = QLabel(f"Counter: {counter.value}")
+        counterButton = QPushButton("Increment Counter")
+        counterButton.clicked.connect(self.incrementCounter)
+        counterLayout.addWidget(self.counterLabel)
+        counterLayout.addWidget(counterButton)
+        subscribeableSection.addLayout(counterLayout)
+        
+        mainLayout.addLayout(subscribeableSection)
+        
+        # Navigation buttons
+        navLayout = QHBoxLayout()
+        buttonBack = QPushButton('Go Back to Main Screen')
+        buttonBack.clicked.connect(lambda: parent.setScreen('main'))
+        buttonOther = QPushButton('Go to Other Screen')
+        buttonOther.clicked.connect(lambda: parent.setScreen('other'))
+        navLayout.addWidget(buttonBack)
+        navLayout.addWidget(buttonOther)
+        mainLayout.addLayout(navLayout)
+        
+        # Set the layout
+        self.setLayout(mainLayout)
+    
+    def incrementCount(self):
+        """Increment the count state."""
+        self.setCount(self.count() + 1)
+    
+    def incrementCounter(self):
+        """Increment the counter Subscribeable."""
+        counter.value = counter.value + 1
+    
+    def onCountChange(self, newValue):
+        """Handle count state changes."""
+        self.countLabel.setText(f"Count: {newValue}")
+        Qurderer.components.Notify(f"Count changed to {newValue}", 1000, self.widgetParent)
+    
+    def onTextChange(self, newValue):
+        """Handle text state changes."""
+        self.textLabel.setText(f"Text: {newValue}")
+    
+    def onCounterChange(self, newValue):
+        """Handle counter Subscribeable changes."""
+        self.counterLabel.setText(f"Counter: {newValue}")
+        Qurderer.components.Notify(f"Counter changed to {newValue}", 1000, self.widgetParent)
 
 @Qurderer.Window('popup', 'Popup Window', [710, 100, 400, 150], QIcon(), resizable=False)
 @Qurderer.UseSessionStorage()
@@ -438,3 +752,4 @@ if __name__ == "__main__":
     window.show()
     sys.exit(app.exec_())
 ```
+</details>
