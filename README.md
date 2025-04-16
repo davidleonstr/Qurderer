@@ -330,7 +330,7 @@ class LoginScreen(QWidget):
 ### Complete Application Example
 
 <details>
-<summary>Click to expand the complete application example.</summary>
+<summary>Complete application example.</summary>
 
 ```python
 import Qurderer
@@ -761,4 +761,23 @@ if __name__ == "__main__":
     window.show()
     sys.exit(app.exec_())
 ```
+</details>
+
+<hr>
+
+### Coding Style
+
+<details>
+<summary>Qurderer follows the PyQt5 coding conventions and naming patterns.</summary>
+<br>
+
+- **Class Names**: Use PascalCase for class names (e.g., `QMainWindow`, `QWidget`, `MyCustomWidget`)
+- **Method Names**: Use camelCase for method names (e.g., `setText`, `addWidget`, `connect`)
+- **Variable Names**: Use camelCase for variable names (e.g., `mainWindow`, `buttonLabel`, `widgetParent`)
+- **Signal Names**: Use camelCase and start with a verb (e.g., `clicked`, `textChanged`, `valueChanged`)
+- **Slot Names**: Use camelCase and start with a verb (e.g., `onButtonClick`, `handleTextChange`)
+- **Constants**: Use UPPER_CASE for constants (e.g., `MAX_WIDTH`, `DEFAULT_TIMEOUT`)
+- **Private Members**: Use underscore prefix for private members (e.g., `_privateMethod`, `_privateVariable`)
+
+This consistent style makes the code more readable and maintainable, while following the established PyQt5 conventions.
 </details>
