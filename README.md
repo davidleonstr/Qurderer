@@ -117,6 +117,7 @@ class ScreenClass(QWidget):
     name: str
     screenName: str
     reloadUI: Callable[[], None]
+    setScreenName: Callable[[str], None]
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -145,6 +146,7 @@ class PopupWindow(QMainWindow):
     title: str
     windowGeometry: List[int]
     windowParent: object
+    setWindowName: Callable[[str], None]
 
     def __init__(self, parent):
         super().__init__(parent)

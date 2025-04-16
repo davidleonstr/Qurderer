@@ -28,7 +28,12 @@ def Screen(name: str, autoreloadUI: bool = False):
         autoreloadUI (bool): If True, ensures the class has a `UI` method and reloads it on show.
 
     Returns:
-        decorator: A class decorator that adds the `name` attribute and `showEvent` method.
+        decorator: A class decorator that adds the following to the decorated class:
+            - `name` attribute: The screen name as an instance attribute
+            - `screenName` attribute: The screen name as a class attribute
+            - `reloadUI()` method: Reloads the user interface
+            - `setScreenName(name)` method: Changes the screen name
+            - `showEvent` method: If autoreloadUI is True, reloads UI on show
     """
 
     def decorator(cls):
@@ -98,10 +103,27 @@ def Screen(name: str, autoreloadUI: bool = False):
             
             removeAllLayouts(self)
             QTimer.singleShot(0, lambda: self.UI(self.widgetParent))
+        
+        def setScreenName(self, name: str) -> None:
+            """
+            Changes the name of the screen.
+            
+            Args:
+                name (str): The new name for the screen.
+                
+            Raises:
+                ValueError: If name is empty or not a string.
+            """
+            if not name:
+                raise ValueError("Screen name must be a non-empty string")
+            
+            self.name = name
+            cls.screenName = name
 
         cls.__init__ = newInit
         cls.screenName = name
         cls.reloadUI = reloadUI
+        cls.setScreenName = setScreenName
 
         if autoreloadUI:
             originalShowEvent = getattr(cls, 'showEvent', QWidget.showEvent)

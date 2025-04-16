@@ -30,7 +30,13 @@ def Window(
         resizable (bool, optional): The ability to resize the window. Defaults to True.
     
     Returns:
-        function: A decorator that adds window properties and screen management.
+        function: A decorator that adds the following to the decorated class:
+            - Window properties (name, title, geometry, icon)
+            - Screen management attributes (screenHistory, screens, stackedScreens)
+            - `addScreen(screen)` method: Adds a screen to the window
+            - `setScreen(name)` method: Sets the current screen
+            - `goBack()` method: Navigates back to the previous screen
+            - `setWindowName(name)` method: Changes the window name
     """
     def decorator(cls):
         """
@@ -133,6 +139,21 @@ def Window(
             if self.screenHistory:
                 previousScreen = self.screenHistory.pop()
                 self.stackedScreens.setCurrentWidget(previousScreen)
+        
+        def setWindowName(self, name: str) -> None:
+            """
+            Changes the name of the window.
+            
+            Args:
+                name (str): The new name for the window.
+                
+            Raises:
+                ValueError: If name is empty or not a string.
+            """
+            if not name:
+                raise ValueError("Window name must be a non-empty string")
+            
+            self.name = name
 
         # Asignar el método __init__ a la clase
         cls.__init__ = newInit
@@ -141,6 +162,7 @@ def Window(
         cls.addScreen = addScreen
         cls.setScreen = setScreen
         cls.goBack = goBack
+        cls.setWindowName = setWindowName
 
         return cls
 
