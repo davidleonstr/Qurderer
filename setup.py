@@ -10,7 +10,7 @@ setup(
         "PyQt5_sip",
         "setuptools",
     ],
-    description="A Python package for managing screens, windows, styles, global configurations, and session storage in PyQt5 applications.",
+    description="Python package designed to simplify the management of PyQt5 applications.",
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
     author="David León",
