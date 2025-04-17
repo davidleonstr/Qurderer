@@ -68,6 +68,9 @@ pip install -e .
 
 ## Example usage
 
+<details>
+<summary>Complete example usage.</summary>
+
 ### Main Window Setup
 
 ```python
@@ -329,10 +332,13 @@ class LoginScreen(QWidget):
             self.statusLabel.setText(f"Logged in as {newValue['name']}")
 ```
 
-### Complete Application Example
+</details>
+
+## Complete Application Example
 
 <details>
 <summary>Complete application example.</summary>
+<br>
 
 ```python
 import Qurderer
@@ -765,9 +771,7 @@ if __name__ == "__main__":
 ```
 </details>
 
-<hr>
-
-### Coding Style
+## Coding Style
 
 <details>
 <summary>Qurderer follows the PyQt5 coding conventions and naming patterns.</summary>
