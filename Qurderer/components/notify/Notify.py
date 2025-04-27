@@ -62,6 +62,8 @@ class Notify(QWidget):
         self.elapsedTime = 0
         self.message = message
 
+        self.msRenderTime = 16
+
         if len(message) > characterLimit:
             self.message = message[:characterLimit - 1] + '...'
 
@@ -133,9 +135,14 @@ class Notify(QWidget):
 
         self.updatePosition()
 
+        # Dynamic update of notifications position
+        self.positionTimer = QTimer(self)
+        self.positionTimer.timeout.connect(self.updatePosition)
+        self.positionTimer.start(self.msRenderTime) # Approximately 60 fps
+
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.updateProgress)
-        self.timer.start(30)
+        self.timer.start(self.msRenderTime) # Approximately 60 fps
 
         QTimer.singleShot(duration, self.close)
 
