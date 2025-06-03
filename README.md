@@ -134,25 +134,31 @@ class ScreenClass(QWidget):
         pass
 ```
 
-### Popup Window
+### Window
 
 ```python
-import Qurderer
-from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtGui import QIcon
-from typing import List
+from PyQt5.QtWidgets import QMainWindow, QWidget
+from typing import Callable
 
 @Qurderer.Window('popup', 'Popup Window', [710, 100, 400, 150], QIcon(), resizable=False)
 class PopupWindow(QMainWindow):
     # Type hints for better IDE support
-    name: str
     title: str
-    windowGeometry: List[int]
-    windowParent: object
+    windowGeometry: list
+    icon: QIcon
+    addScreen: Callable[[QWidget], None]
+    setScreen: Callable[[str], None]
     setWindowName: Callable[[str], None]
+    goBack: Callable[[], None]
+    screens: dict
+    name: str
 
+    """Popup window with screen management and session storage."""
     def __init__(self, parent):
+        """Initialize the popup window with screen management."""
         super().__init__(parent)
+        self.mainWindow = parent
 ```
 
 ### State Management Examples
