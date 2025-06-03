@@ -134,7 +134,7 @@ class ScreenClass(QWidget):
         pass
 ```
 
-### Window
+### Window Definition
 
 ```python
 from PyQt5.QtGui import QIcon
